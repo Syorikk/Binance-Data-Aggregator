@@ -23,7 +23,7 @@ def fetch_binance_data(symbol, start_date, end_date):
         'endTime': end_timestamp
         })
     # print(response)
-    pprint.pprint(response.json())
+    # pprint.pprint(response.json())
     # print(response.status_code)
 
     if response.status_code == 200:
