@@ -49,5 +49,5 @@ columns = [
     "ignore"
 ]
 df = pd.DataFrame(data, columns=columns)#columns=['ВРЕМЯ_ОТКРЫТИЯ', 'ОТКРЫТИЕ', 'МАКСИМУМ', 'МИНИМУМ', 'ЗАКРЫТИЕ', 'ОБЪЕМ', 'ВРЕМЯ_ЗАКРЫТИЯ', 'СРЕДНЯЯ_ЦЕНА'])
-df = df.rename()
+#df = df.rename()
 print(df.head(5).to_string())
