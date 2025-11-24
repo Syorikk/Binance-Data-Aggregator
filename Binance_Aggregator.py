@@ -48,6 +48,7 @@ columns = [
     "taker_buy_quote_asset_volume",
     "ignore"
 ]
-df = pd.DataFrame(data, columns=columns)#columns=['ВРЕМЯ_ОТКРЫТИЯ', 'ОТКРЫТИЕ', 'МАКСИМУМ', 'МИНИМУМ', 'ЗАКРЫТИЕ', 'ОБЪЕМ', 'ВРЕМЯ_ЗАКРЫТИЯ', 'СРЕДНЯЯ_ЦЕНА'])
+df = pd.DataFrame(data, columns=columns)
+#columns=['ВРЕМЯ_ОТКРЫТИЯ', 'ОТКРЫТИЕ', 'МАКСИМУМ', 'МИНИМУМ', 'ЗАКРЫТИЕ', 'ОБЪЕМ', 'ВРЕМЯ_ЗАКРЫТИЯ', 'СРЕДНЯЯ_ЦЕНА' ДОДЕЛАТЬ])
 #df = df.rename()
 print(df.head(5).to_string())
