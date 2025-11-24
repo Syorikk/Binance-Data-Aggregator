@@ -6,14 +6,17 @@ import pprint
 from datetime import datetime
 
 def fetch_binance_data(symbol, start_date, end_date):
+
     # Преобразование строки дат в datetime объекты
     start_dt = datetime.strptime(start_date, '%Y-%m-%d')
     end_dt = datetime.strptime(end_date, '%Y-%m-%d')
     #print(f"{start_dt=}, {end_dt=}") # Done | No errors here
+
     # Преобразование в миллисекунды для API
     start_timestamp = int(start_dt.timestamp() * 1000)
     end_timestamp = int(end_dt.timestamp() * 1000)
     #print(f"{start_timestamp=}, {end_timestamp=}")
+
     # Запросик
     url = 'https://api.binance.com/api/v3/klines'
     response = requests.get(url, params = {
@@ -50,6 +53,7 @@ columns = [
 ]
 
 df = pd.DataFrame(data, columns=columns)
+
 #columns=['ВРЕМЯ_ОТКРЫТИЯ', 'ОТКРЫТИЕ', 'МАКСИМУМ', 'МИНИМУМ', 'ЗАКРЫТИЕ', 'ОБЪЕМ', 'ВРЕМЯ_ЗАКРЫТИЯ', 'СРЕДНЯЯ_ЦЕНА' ДОДЕЛАТЬ])
 #df = df.rename()
 print(df.head(5).to_string())
