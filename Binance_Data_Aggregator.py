@@ -5,15 +5,44 @@ import pandas as pd
 import pprint
 from datetime import datetime
 
+def main():
+    if len(sys.argv) != 4:
+        print(f'Используйте скрипт правильно - <скрипт.py> <BTC> <%Y-%m-%d> <%Y-%m-%d>')
+        sys.exit()
+
+    ticker = sys.argv[1].upper()
+
+    # Добавляю USDT
+    if not ticker.endswith('USDT'):
+        symbol = ticker + 'USDT'
+    else:
+        symbol = ticker
+
+    start_date = sys.argv[2]
+    end_date = sys.argv[3]
+
+    raw_data = fetch_binance_data(symbol, start_date, end_date)
+    df_detail, df_summary = transform_data(raw)
+    save_to_excel(df_detail, df_summary)
+
 def fetch_binance_data(symbol, start_date, end_date):
-    # Преобразование строки дат в datetime объекты
-    start_dt = datetime.strptime(start_date, '%Y-%m-%d')
-    end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-    #print(f"{start_dt=}, {end_dt=}") # Done | No errors here
+
+    try:
+        start_dt = datetime.strptime(start_date, '%Y-%m-%d')
+        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+    except ValueError:
+        print("Ошибка: дата должна быть в формате YYYY-MM-DD")
+        sys.exit()
+    if start_date >= end_date:
+        print("Ошибка: start_date должна быть раньше end_date")
+        sys.exit()
+
+
     # Преобразование в миллисекунды для API
     start_timestamp = int(start_dt.timestamp() * 1000)
     end_timestamp = int(end_dt.timestamp() * 1000)
     #print(f"{start_timestamp=}, {end_timestamp=}")
+
     # Запросик
     url = 'https://api.binance.com/api/v3/klines'
     response = requests.get(url, params = {
@@ -22,17 +51,15 @@ def fetch_binance_data(symbol, start_date, end_date):
         'startTime': start_timestamp,
         'endTime': end_timestamp
         })
-    # print(response)
-    # pprint.pprint(response.json())
-    # print(response.status_code)
+    #print(response)
+    #pprint.pprint(response.json())
+    #print(response.status_code)
 
     if response.status_code == 200:
         return response.json()
     else:
         raise Exception(f"API error: {response.status_code}")
 
-
-data:dict = fetch_binance_data(symbol='ETHUSDT', start_date='2025-11-01', end_date='2025-11-13')
 
 columns = [
     "open_time",
@@ -48,7 +75,23 @@ columns = [
     "taker_buy_quote_asset_volume",
     "ignore"
 ]
-df = pd.DataFrame(data, columns=columns)#columns=['ВРЕМЯ_ОТКРЫТИЯ', 'ОТКРЫТИЕ', 'МАКСИМУМ', 'МИНИМУМ', 'ЗАКРЫТИЕ', 'ОБЪЕМ', 'ВРЕМЯ_ЗАКРЫТИЯ', 'СРЕДНЯЯ_ЦЕНА'])
-#df = df.rename()
+df = pd.DataFrame(data, columns=columns)
+
+# Переименование колонок на русский
+df = df.rename(columns={
+    "open_time": "ВРЕМЯ_ОТКРЫТИЯ",
+    "open": "ОТКРЫТИЕ",
+    "high": "МАКСИМУМ",
+    "low": "МИНИМУМ",
+    "close": "ЗАКРЫТИЕ",
+    "volume": "ОБЪЕМ",
+    "close_time": "ВРЕМЯ_ЗАКРЫТИЯ",
+    "quote_asset_volume": "ОБЪЕМ КОТИРУЕМЫХ АКТИВОВ",
+    "number_of_trades": "КОЛИЧЕСТВО_СДЕЛОК",
+    "taker_buy_base_asset_volume": "ОБЪЕМ_ПОКУПКИ_БАЗОВОГО_АКТИВА",
+    "taker_buy_quote_asset_volume": "ОБЪЕМ_ПОКУПКИ_КВОТНОГО_АКТИВА",
+    "ignore": "ИГНОР"
+})
+
 print(df.head(5).to_string())
 

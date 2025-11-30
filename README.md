@@ -16,5 +16,5 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/your-username/binance-data-aggregator.git
+git clone https://github.com/Syorikk/Binance-Data-Aggregator
 cd binance-data-aggregator
