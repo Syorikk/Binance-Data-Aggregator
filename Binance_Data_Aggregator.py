@@ -22,7 +22,7 @@ def main():
     end_date = sys.argv[3]
 
     raw_data = fetch_binance_data(symbol, start_date, end_date)
-    df_detail, df_summary = transform_data(raw)
+    df_detail, df_summary = transform_data(raw_data)
     save_to_excel(df_detail, df_summary)
 
 def fetch_binance_data(symbol, start_date, end_date):
@@ -33,7 +33,7 @@ def fetch_binance_data(symbol, start_date, end_date):
     except ValueError:
         print("Ошибка: дата должна быть в формате YYYY-MM-DD")
         sys.exit()
-    if start_date >= end_date:
+    if start_dt >= end_dt:
         print("Ошибка: start_date должна быть раньше end_date")
         sys.exit()
 
@@ -41,7 +41,7 @@ def fetch_binance_data(symbol, start_date, end_date):
     # Преобразование в миллисекунды для API
     start_timestamp = int(start_dt.timestamp() * 1000)
     end_timestamp = int(end_dt.timestamp() * 1000)
-    #print(f"{start_timestamp=}, {end_timestamp=}")
+
 
     # Запросик
     url = 'https://api.binance.com/api/v3/klines'
@@ -51,47 +51,44 @@ def fetch_binance_data(symbol, start_date, end_date):
         'startTime': start_timestamp,
         'endTime': end_timestamp
         })
-    #print(response)
-    #pprint.pprint(response.json())
-    #print(response.status_code)
+
 
     if response.status_code == 200:
         return response.json()
     else:
         raise Exception(f"API error: {response.status_code}")
 
+def transform_data(raw_data):
+    columns = [
+        "open_time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "close_time",
+        "quote_asset_volume",
+        "number_of_trades",
+        "taker_buy_base_asset_volume",
+        "taker_buy_quote_asset_volume",
+        "ignore"
+    ]
 
-columns = [
-    "open_time",
-    "open",
-    "high",
-    "low",
-    "close",
-    "volume",
-    "close_time",
-    "quote_asset_volume",
-    "number_of_trades",
-    "taker_buy_base_asset_volume",
-    "taker_buy_quote_asset_volume",
-    "ignore"
-]
-df = pd.DataFrame(data, columns=columns)
+    df = pd.DataFrame(raw_data, columns=columns)
 
-# Переименование колонок на русский
-df = df.rename(columns={
-    "open_time": "ВРЕМЯ_ОТКРЫТИЯ",
-    "open": "ОТКРЫТИЕ",
-    "high": "МАКСИМУМ",
-    "low": "МИНИМУМ",
-    "close": "ЗАКРЫТИЕ",
-    "volume": "ОБЪЕМ",
-    "close_time": "ВРЕМЯ_ЗАКРЫТИЯ",
-    "quote_asset_volume": "ОБЪЕМ КОТИРУЕМЫХ АКТИВОВ",
-    "number_of_trades": "КОЛИЧЕСТВО_СДЕЛОК",
-    "taker_buy_base_asset_volume": "ОБЪЕМ_ПОКУПКИ_БАЗОВОГО_АКТИВА",
-    "taker_buy_quote_asset_volume": "ОБЪЕМ_ПОКУПКИ_КВОТНОГО_АКТИВА",
-    "ignore": "ИГНОР"
-})
-
-print(df.head(5).to_string())
+    # Переименование колонок на русский
+    df = df.rename(columns={
+        "open_time": "ВРЕМЯ_ОТКРЫТИЯ",
+        "open": "ОТКРЫТИЕ",
+        "high": "МАКСИМУМ",
+        "low": "МИНИМУМ",
+        "close": "ЗАКРЫТИЕ",
+        "volume": "ОБЪЕМ",
+        "close_time": "ВРЕМЯ_ЗАКРЫТИЯ",
+        "quote_asset_volume": "ОБЪЕМ КОТИРУЕМЫХ АКТИВОВ",
+        "number_of_trades": "КОЛИЧЕСТВО_СДЕЛОК",
+        "taker_buy_base_asset_volume": "ОБЪЕМ_ПОКУПКИ_БАЗОВОГО_АКТИВА",
+        "taker_buy_quote_asset_volume": "ОБЪЕМ_ПОКУПКИ_КВОТНОГО_АКТИВА",
+        "ignore": "ИГНОР"
+    })
 
