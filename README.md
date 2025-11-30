@@ -1,2 +1,20 @@
-# Binance-Data-Aggregator
-The project is a Python CLI tool for extracting historical price data from the Binance API, transforming it, and saving it into Excel files with two sheets: detailed data and an aggregated summary. It uses an ETL (Extract, Transform, Load) approach to processing crypto data.
+# Binance Data Aggregation (CLI ETL)
+
+Проект представляет собой Python CLI утилиту для получения, обработки и сохранения данных о криптовалютах с Binance API.
+
+## Функциональность
+
+- Получение данных свечей (kline) с Binance API
+- Трансформация данных с переименованием колонок на русский язык
+- Расчет дополнительных метрик (средняя цена и др.)
+- Сохранение в Excel файл с двумя листами:
+  - **Детали** - полные данные с преобразованными колонками
+  - **Сводка** - агрегированные дневные метрики
+- Поддержка нескольких криптовалютных тикеров
+
+### Установка
+
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/your-username/binance-data-aggregator.git
+cd binance-data-aggregator
