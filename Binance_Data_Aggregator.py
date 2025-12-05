@@ -133,7 +133,8 @@ def transform_data(raw_data):
         СУММАРНЫЙ_ОБЪЕМ=('ОБЪЕМ', 'sum')
     ).reset_index()
 
-    return df, df_summary
+    df_detail = df.copy()
+    return df_detail, df_summary
 
 if __name__ == "__main__":
     main()
