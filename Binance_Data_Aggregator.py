@@ -2,7 +2,7 @@ import os
 import sys
 import requests
 import pandas as pd
-import pprint
+#import pprint
 from datetime import datetime
 
 def main():
@@ -23,7 +23,17 @@ def main():
 
     raw_data = fetch_binance_data(symbol, start_date, end_date)
     df_detail, df_summary = transform_data(raw_data)
-    save_to_excel(df_detail, df_summary)
+    #save_to_excel(df_detail, df_summary)
+
+    # ВРЕМЕННЫЕ ОТЛАДОЧНЫЕ ВЫВОДЫ
+    print("Получено строк:", len(raw_data))
+    print("\nПервые строки df_detail:")
+    print(df_detail.head())
+
+    print("\nПервые строки df_summary:")
+    print(df_summary.head())
+
+    # save_to_excel(df_detail, df_summary)
 
 def fetch_binance_data(symbol, start_date, end_date):
 
@@ -37,11 +47,9 @@ def fetch_binance_data(symbol, start_date, end_date):
         print("Ошибка: start_date должна быть раньше end_date")
         sys.exit()
 
-
     # Преобразование в миллисекунды для API
     start_timestamp = int(start_dt.timestamp() * 1000)
     end_timestamp = int(end_dt.timestamp() * 1000)
-
 
     # Запросик
     url = 'https://api.binance.com/api/v3/klines'
@@ -51,7 +59,6 @@ def fetch_binance_data(symbol, start_date, end_date):
         'startTime': start_timestamp,
         'endTime': end_timestamp
         })
-
 
     if response.status_code == 200:
         return response.json()
@@ -92,3 +99,41 @@ def transform_data(raw_data):
         "ignore": "ИГНОР"
     })
 
+    # Преобразование временных метки в читаемый формат datetime, для exel
+    df['ВРЕМЯ_ОТКРЫТИЯ'] = pd.to_datetime(df['ВРЕМЯ_ОТКРЫТИЯ'], unit='ms')
+    df['ВРЕМЯ_ЗАКРЫТИЯ'] = pd.to_datetime(df['ВРЕМЯ_ЗАКРЫТИЯ'], unit='ms')
+
+    # Вычисление колонки средней цены
+    df['СРЕДНЯЯ_ЦЕНА'] = (df['МАКСИМУМ'].astype(float) + df['МИНИМУМ'].astype(float)) / 2
+
+    # Приведение числовых колонок к float
+    numeric_columns = [
+        "ОТКРЫТИЕ",
+        "МАКСИМУМ",
+        "МИНИМУМ",
+        "ЗАКРЫТИЕ",
+        "ОБЪЕМ",
+        "ОБЪЕМ КОТИРУЕМЫХ АКТИВОВ",
+        "ОБЪЕМ_ПОКУПКИ_БАЗОВОГО_АКТИВА",
+        "ОБЪЕМ_ПОКУПКИ_КВОТНОГО_АКТИВА"
+    ]
+    df[numeric_columns] = df[numeric_columns].astype(float)
+
+    # Создание сводного DataFrame (df_summary)
+
+    # Создание колонки дата для группировки
+    df["ДАТА"] = df["ВРЕМЯ_ОТКРЫТИЯ"].dt.date
+
+    # Группировка по дате
+    df_summary = df.groupby('ДАТА').agg(
+        СРЕДНЕЕ_ЗАКРЫТИЕ=('ЗАКРЫТИЕ', 'mean'),
+        МИН_ЗАКРЫТИЕ=('ЗАКРЫТИЕ', 'min'),
+        МАКС_ЗАКРЫТИЕ=('ЗАКРЫТИЕ', 'max'),
+        СРЕДНЯЯ_ЦЕНА_СВЕЧИ=('СРЕДНЯЯ_ЦЕНА', 'mean'),
+        СУММАРНЫЙ_ОБЪЕМ=('ОБЪЕМ', 'sum')
+    ).reset_index()
+
+    return df, df_summary
+
+if __name__ == "__main__":
+    main()
