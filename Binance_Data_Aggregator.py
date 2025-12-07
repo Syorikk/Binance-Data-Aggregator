@@ -1,8 +1,6 @@
-import os
 import sys
 import requests
 import pandas as pd
-#import pprint
 from datetime import datetime
 
 def main():
@@ -23,17 +21,7 @@ def main():
 
     raw_data = fetch_binance_data(symbol, start_date, end_date)
     df_detail, df_summary = transform_data(raw_data)
-    #save_to_excel(df_detail, df_summary)
-
-    # ВРЕМЕННЫЕ ОТЛАДОЧНЫЕ ВЫВОДЫ
-    print("Получено строк:", len(raw_data))
-    print("\nПервые строки df_detail:")
-    print(df_detail.head())
-
-    print("\nПервые строки df_summary:")
-    print(df_summary.head())
-
-    # save_to_excel(df_detail, df_summary)
+    save_to_excel(df_detail, df_summary, symbol, start_date, end_date)
 
 def fetch_binance_data(symbol, start_date, end_date):
 
@@ -135,6 +123,16 @@ def transform_data(raw_data):
 
     df_detail = df.copy()
     return df_detail, df_summary
+
+def save_to_excel(df_detail, df_summary, symbol, start_date, end_date):
+    filename = f"binance_{symbol}_{start_date}_{end_date}.xlsx"
+
+    # Excel writer с движком openpyxl
+    with pd.ExcelWriter(filename, engine="openpyxl") as writer:
+        df_detail.to_excel(writer, sheet_name="Детали", index=False)
+        df_summary.to_excel(writer, sheet_name="Сводка", index=False)
+
+    print(f"Файл успешно сохранён: {filename}")
 
 if __name__ == "__main__":
     main()
