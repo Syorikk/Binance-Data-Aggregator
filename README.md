@@ -18,3 +18,10 @@
 ```bash
 git clone https://github.com/Syorikk/Binance-Data-Aggregator
 cd binance-data-aggregator
+
+📌 Project Structure
+binance-data-aggregator/
+│── binance_task.py
+│── README.md
+│── requirements.txt
+│── .gitignore
